@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#14284b">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Mi Negocio">
+<title>Mi Negocio</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Layout: app de una pantalla para celular — encabezado, contenido con scroll, barra de pestañas abajo */
+:root{
+  --ink:#14284b;
+  --bg:#f3f4f7;
+  --card:#ffffff;
+  --line:#dde1ea;
+  --muted:#5d6782;
+  --accent:#f2a516;
+  --accent-ink:#2a1d00;
+  --good:#1f8a4c;
+  --bad:#c7362b;
+  --warn-bg:#fff4dc;
+  --font-display:"Barlow Condensed","Arial Narrow",sans-serif;
+  --font-body:"Barlow",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ink:#dfe6f5;--bg:#0f1524;--card:#18203a;--line:#2a3555;--muted:#9aa6c4;
+    --accent:#f5b33a;--accent-ink:#241800;--good:#47c07a;--bad:#ff6b5e;--warn-bg:#3a2e12;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --ink:#dfe6f5;--bg:#0f1524;--card:#18203a;--line:#2a3555;--muted:#9aa6c4;
+  --accent:#f5b33a;--accent-ink:#241800;--good:#47c07a;--bad:#ff6b5e;--warn-bg:#3a2e12;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:16px;-webkit-tap-highlight-color:transparent}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.app{height:100%;display:flex;flex-direction:column;max-width:640px;margin:0 auto}
+header{background:#14284b;color:#fff;padding:calc(env(safe-area-inset-top) + 12px) 16px 12px;display:flex;align-items:center;gap:12px}
+header h1{font-family:var(--font-display);font-size:26px;margin:0;letter-spacing:.5px;flex:1}
+header .date{font-size:13px;opacity:.8}
+.icon-btn{background:transparent;border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:10px;width:40px;height:40px;display:grid;place-items:center}
+main{flex:1;overflow-y:auto;padding:16px 16px 24px}
+nav.tabs{display:grid;grid-template-columns:repeat(4,1fr);background:var(--card);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+nav.tabs button{background:none;border:0;padding:8px 4px 10px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:13px;font-weight:600;color:var(--muted);position:relative}
+nav.tabs button svg{width:24px;height:24px}
+nav.tabs button[aria-current="page"]{color:var(--ink)}
+nav.tabs button[aria-current="page"]::before{content:"";position:absolute;top:0;left:25%;right:25%;height:3px;background:var(--accent);border-radius:0 0 3px 3px}
+.badge{position:absolute;top:4px;right:calc(50% - 22px);background:var(--bad);color:#fff;font-size:11px;border-radius:9px;min-width:18px;height:18px;padding:0 5px;display:grid;place-items:center}
+h2{font-family:var(--font-display);font-size:24px;margin:0;text-wrap:balance}
+.row{display:flex;align-items:center;gap:8px}
+.between{justify-content:space-between}
+.stack{display:flex;flex-direction:column;gap:12px}
+.muted{color:var(--muted)}
+.small{font-size:14px}
+.num{font-variant-numeric:tabular-nums}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}
+.banner{background:var(--warn-bg);border:1px solid var(--accent);border-radius:12px;padding:10px 12px;font-size:14px;display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+input[type=text],input[type=number],input[type=search],select,textarea{width:100%;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;font-size:16px}
+textarea{min-height:120px;font-family:ui-monospace,monospace;font-size:13px}
+label{font-size:14px;font-weight:600;color:var(--muted);display:flex;flex-direction:column;gap:4px}
+.btn{border:0;border-radius:12px;padding:12px 16px;font-weight:700;font-size:16px;background:var(--line);color:var(--ink)}
+.btn.primary{background:var(--accent);color:var(--accent-ink)}
+.btn.dark{background:#14284b;color:#fff}
+.btn.danger{background:transparent;color:var(--bad);border:1px solid var(--bad)}
+.btn.ghost{background:transparent;border:1px solid var(--line)}
+.btn.block{width:100%}
+.btn.sm{padding:8px 12px;font-size:14px;border-radius:10px}
+.prod-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+.prod{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;text-align:left;display:flex;flex-direction:column;gap:6px;min-height:92px;position:relative}
+.prod:active{transform:scale(.97)}
+.prod .name{font-weight:600;line-height:1.2}
+.prod .price{font-family:var(--font-display);font-size:22px;margin-top:auto}
+.prod .qty{position:absolute;top:8px;right:8px;background:var(--accent);color:var(--accent-ink);font-weight:700;border-radius:10px;min-width:24px;height:24px;display:grid;place-items:center;font-size:14px;padding:0 6px}
+.pill{display:inline-block;font-size:12px;font-weight:700;border-radius:20px;padding:2px 8px;background:var(--line);color:var(--muted)}
+.pill.low{background:var(--bad);color:#fff}
+.pill.ok{background:transparent;border:1px solid var(--line)}
+.cartbar{position:sticky;bottom:0;margin:16px -16px -24px;padding:12px 16px;background:var(--bg);border-top:1px solid var(--line)}
+.list{display:flex;flex-direction:column}
+.list .item{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}
+.list .item:last-child{border-bottom:0}
+.grow{flex:1;min-width:0}
+.stepper{display:flex;align-items:center;gap:6px}
+.stepper button{width:36px;height:36px;border-radius:10px;border:1px solid var(--line);background:var(--card);font-weight:700;font-size:18px}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px}
+.tile .lbl{font-size:13px;color:var(--muted);font-weight:600}
+.tile .val{font-family:var(--font-display);font-size:28px;line-height:1.1;margin-top:4px}
+.tile.big{grid-column:1/-1;background:#14284b;color:#fff;border-color:#14284b}
+.tile.big .lbl{color:rgba(255,255,255,.75)}
+.tile.big .val{font-size:40px}
+.pos{color:var(--good)}.neg{color:var(--bad)}
+.tile.big .pos{color:#7be3a6}.tile.big .neg{color:#ff9d93}
+.seg{display:grid;grid-template-columns:1fr 1fr;background:var(--line);border-radius:12px;padding:3px}
+.seg button{border:0;background:transparent;padding:8px;border-radius:10px;font-weight:700;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--card);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.1)}
+.methods{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.methods button{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:10px 4px;font-weight:600;font-size:14px}
+.methods button[aria-pressed="true"]{border-color:var(--accent);background:var(--warn-bg);box-shadow:inset 0 0 0 1px var(--accent)}
+.bar{height:8px;background:var(--line);border-radius:4px;overflow:hidden}
+.bar>span{display:block;height:100%;background:var(--accent);border-radius:4px}
+.sheet{position:fixed;inset:0;background:rgba(10,15,30,.5);display:flex;align-items:flex-end;justify-content:center;z-index:20}
+.sheet[hidden]{display:none}
+.sheet-card{background:var(--bg);width:100%;max-width:640px;max-height:92%;overflow-y:auto;border-radius:18px 18px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom))}
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#14284b;color:#fff;padding:10px 16px;border-radius:12px;font-weight:600;z-index:30;box-shadow:0 4px 16px rgba(0,0,0,.25)}
+.toast[hidden]{display:none}
+.empty{text-align:center;padding:32px 16px;color:var(--muted)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.searchbar{position:sticky;top:0;z-index:5;display:flex;gap:8px;background:var(--bg);padding:4px 0 6px}
+.searchbar input{flex:1}
+.searchbar .btn{padding:0 16px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}.prod:active{transform:none}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>Mi Negocio</h1>
+    <span class="date" id="hdrDate"></span>
+    <button class="icon-btn" id="btnSettings" aria-label="Copia de seguridad y ajustes">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+    </button>
+  </header>
+  <main id="main"></main>
+  <nav class="tabs" aria-label="Secciones">
+    <button data-tab="vender"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6h15l-1.5 9h-12z"/><path d="M6 6 5 3H2"/><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/></svg>Vender</button>
+    <button data-tab="productos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="m3 8 9 5 9-5M12 13v8"/></svg>Productos<span class="badge" id="lowBadge" hidden></span></button>
+    <button data-tab="compras"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="7" width="14" height="10" rx="1"/><path d="M15 10h4l3 3v4h-7"/><circle cx="6" cy="18" r="2"/><circle cx="18" cy="18" r="2"/></svg>Compras</button>
+    <button data-tab="balance"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Balance</button>
+  </nav>
+</div>
+<div class="sheet" id="sheet" hidden><div class="sheet-card" id="sheetBody" role="dialog" aria-modal="true"></div></div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+/* ---------- Datos ---------- */
+const KEY = 'mi-kiosco-v1';
+let storageOk = true;
+let S = null;
+
+function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+function load(){ try{ const r = localStorage.getItem(KEY); return r ? JSON.parse(r) : null; }catch(e){ storageOk=false; return null; } }
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){ storageOk=false; } }
+
+function seed(){
+  const P = (name, cost, price, stock, min) => ({id:uid(), name, cost, price, stock, min});
+  const products = [
+    P('Coca-Cola 500 ml', 900, 1400, 24, 6),
+    P('Agua mineral 500 ml', 450, 800, 30, 8),
+    P('Alfajor triple', 600, 1000, 18, 6),
+    P('Chicle menta', 250, 500, 40, 10),
+    P('Galletitas dulces', 800, 1300, 12, 4),
+    P('Papas fritas chicas', 700, 1200, 3, 5),
+    P('Caramelos x10', 200, 400, 50, 10),
+    P('Jugo en caja', 500, 900, 15, 5),
+    P('Encendedor', 500, 1000, 2, 4),
+    P('Turrón', 300, 600, 22, 6)
+  ];
+  const sales = [], purchases = [];
+  const now = new Date();
+  const mk = (daysAgo, h, m, picks, method) => {
+    const d = new Date(now); d.setDate(d.getDate()-daysAgo); d.setHours(h,m,0,0);
+    if (d > now) return;
+    const items = picks.map(([i,q]) => ({pid:products[i].id, name:products[i].name, qty:q, price:products[i].price, cost:products[i].cost}));
+    sales.push({id:uid(), ts:d.getTime(), items, method,
+      total: items.reduce((a,x)=>a+x.qty*x.price,0), costTotal: items.reduce((a,x)=>a+x.qty*x.cost,0)});
+  };
+  mk(0,8,40,[[0,1],[2,1]],'Efectivo');
+  mk(0,9,15,[[1,2]],'Transferencia');
+  mk(0,10,5,[[3,3],[6,1]],'Efectivo');
+  mk(0,11,30,[[4,1],[7,2]],'Débito');
+  mk(0,12,50,[[0,2],[5,1]],'Efectivo');
+  mk(0,13,20,[[9,2],[2,1]],'Transferencia');
+  for (let d=1; d<Math.min(now.getDate(),12); d++){
+    mk(d,10,0,[[0,3],[2,2],[1,2]],'Efectivo');
+    mk(d,17,30,[[4,1],[5,2],[7,1]],d%2?'Transferencia':'Efectivo');
+    if (d%3===0) mk(d,19,10,[[8,1],[3,4]],'Débito');
+  }
+  const pd = new Date(now); pd.setDate(Math.max(1, now.getDate()-2)); pd.setHours(7,30,0,0);
+  if (pd <= now) purchases.push({id:uid(), ts:pd.getTime(), supplier:'Mayorista Don Pepe',
+    items:[{pid:products[0].id,name:products[0].name,qty:24,cost:900},{pid:products[2].id,name:products[2].name,qty:20,cost:600}],
+    total: 24*900+20*600});
+  const expenses = [{id:uid(), ts:Date.now()-3600000, amount:1500, note:'Bolsas'}];
+  return {products, sales, purchases, expenses, demo:true};
+}
+
+/* ---------- Utilidades ---------- */
+const fmt = new Intl.NumberFormat('es-AR',{style:'currency',currency:'ARS',minimumFractionDigits:0,maximumFractionDigits:2});
+const money = n => fmt.format(Math.round(n*100)/100);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const num = v => { const n = parseFloat(String(v).replace(',','.')); return isFinite(n) ? n : 0; };
+const sameDay = (a,b) => a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate();
+const sameMonth = (a,b) => a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth();
+const hhmm = ts => new Date(ts).toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'});
+const prodById = id => S.products.find(p => p.id===id);
+const $ = id => document.getElementById(id);
+const norm = s => String(s).normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
+
+function toast(msg){ const t=$('toast'); t.textContent=msg; t.hidden=false; clearTimeout(toast._t); toast._t=setTimeout(()=>t.hidden=true,2200); }
+function openSheet(html){ $('sheetBody').innerHTML = html; $('sheet').hidden = false; }
+function closeSheet(){ $('sheet').hidden = true; $('sheetBody').innerHTML=''; }
+$('sheet').addEventListener('click', e => { if (e.target.id==='sheet') closeSheet(); });
+
+function confirmSheet(title, text, okLabel, onOk){
+  openSheet(`<div class="stack"><h2>${esc(title)}</h2><p class="muted">${esc(text)}</p>
+    <div class="two"><button class="btn ghost" data-act="close">Cancelar</button><button class="btn danger" id="cfOk">${esc(okLabel)}</button></div></div>`);
+  $('cfOk').onclick = () => { closeSheet(); onOk(); };
+}
+
+/* ---------- Estado de la interfaz ---------- */
+let tab = 'vender';
+let cart = {};
+let method = 'Efectivo';
+let query = '';
+let period = 'day';
+let ref = new Date();
+let pLines = [];
+
+function setTab(t){ tab=t; document.querySelectorAll('nav.tabs button').forEach(b => b.setAttribute('aria-current', b.dataset.tab===t ? 'page' : 'false')); render(); $('main').scrollTop=0; }
+document.querySelectorAll('nav.tabs button').forEach(b => b.onclick = () => setTab(b.dataset.tab));
+
+function demoBanner(){
+  if (!S.demo) return '';
+  return `<div class="banner"><span>Estás viendo <b>datos de ejemplo</b>.</span><button class="btn sm dark" data-act="clearDemo">Empezar de cero</button></div>`;
+}
+function storageBanner(){
+  return storageOk ? '' : `<div class="banner"><span>Este navegador no deja guardar datos: lo que cargues se pierde al cerrar.</span></div>`;
+}
+
+function render(){
+  $('hdrDate').textContent = new Date().toLocaleDateString('es-AR',{weekday:'short',day:'numeric',month:'short'});
+  const low = S.products.filter(p => p.stock <= p.min).length;
+  const b = $('lowBadge'); b.hidden = !low; b.textContent = low;
+  const views = {vender:viewVender, productos:viewProductos, compras:viewCompras, balance:viewBalance};
+  $('main').innerHTML = views[tab]();
+  const q = $('q'); if (q){ const cx=$('qClear'); q.oninput = () => { query=q.value; if(cx) cx.hidden=!query; renderGrid(); }; q.onfocus = () => q.select(); }
+}
+
+/* ---------- Vender ---------- */
+function cartCount(){ return Object.values(cart).reduce((a,b)=>a+b,0); }
+function cartTotal(){ return Object.entries(cart).reduce((a,[id,q]) => { const p=prodById(id); return a + (p ? p.price*q : 0); },0); }
+
+function gridHtml(){
+  const words = norm(query).trim().split(/\s+/).filter(Boolean);
+  const list = S.products.filter(p => { const n = norm(p.name); return words.every(w => n.includes(w)); });
+  if (!S.products.length) return `<div class="empty">Todavía no cargaste productos.<br><br><button class="btn primary" data-act="goProductos">Cargar productos</button></div>`;
+  if (!list.length) return `<div class="empty">No hay productos que coincidan con “${esc(query)}”.</div>`;
+  return `<div class="prod-grid">${list.map(p => `
+    <button class="prod" data-act="add" data-id="${p.id}" aria-label="Agregar ${esc(p.name)}">
+      ${cart[p.id] ? `<span class="qty">${cart[p.id]}</span>` : ''}
+      <span class="name">${esc(p.name)}</span>
+      <span class="small ${p.stock<=p.min?'neg':'muted'}">Stock: ${p.stock}</span>
+      <span class="price num">${money(p.price)}</span>
+    </button>`).join('')}</div>`;
+}
+function cartbarHtml(){
+  const n = cartCount();
+  if (!n) return `<div class="muted small" style="text-align:center">Tocá un producto para sumarlo a la venta</div>`;
+  return `<div class="row between"><div><div class="small muted">${n} artículo${n>1?'s':''}</div><div class="num" style="font-family:var(--font-display);font-size:28px">${money(cartTotal())}</div></div>
+    <div class="row"><button class="btn ghost" data-act="clearCart">Vaciar</button><button class="btn primary" data-act="openCart">Cobrar</button></div></div>`;
+}
+function viewVender(){
+  return `<div class="stack">${storageBanner()}${demoBanner()}
+    <div class="searchbar"><input type="search" id="q" placeholder="Buscar producto… (ej: coca 500)" value="${esc(query)}" aria-label="Buscar producto" autocomplete="off"><button class="btn ghost" id="qClear" data-act="clearQ" aria-label="Borrar búsqueda" ${query?'':'hidden'}>✕</button></div>
+    <div id="grid">${gridHtml()}</div></div>
+    <div class="cartbar" id="cartbar">${cartbarHtml()}</div>`;
+}
+function renderGrid(){ const g=$('grid'); if(g) g.innerHTML=gridHtml(); const c=$('cartbar'); if(c) c.innerHTML=cartbarHtml(); }
+
+function cartSheetHtml(){
+  const lines = Object.entries(cart).map(([id,q]) => ({p:prodById(id), q})).filter(x=>x.p);
+  const total = cartTotal();
+  return `<div class="stack">
+    <div class="row between"><h2>Venta</h2><button class="btn sm ghost" data-act="close">Seguir agregando</button></div>
+    <div class="card list">${lines.map(({p,q}) => `
+      <div class="item"><div class="grow"><div style="font-weight:600">${esc(p.name)}</div><div class="small muted num">${money(p.price)} c/u</div></div>
+      <div class="stepper"><button data-act="dec" data-id="${p.id}" aria-label="Quitar uno">−</button><b class="num" style="min-width:24px;text-align:center">${q}</b><button data-act="inc" data-id="${p.id}" aria-label="Sumar uno">+</button></div>
+      <div class="num" style="min-width:76px;text-align:right;font-weight:700">${money(p.price*q)}</div></div>`).join('')}
+    </div>
+    <div class="row between"><span class="muted" style="font-weight:600">Total</span><span class="num" style="font-family:var(--font-display);font-size:34px">${money(total)}</span></div>
+    <div><div class="small muted" style="font-weight:600;margin-bottom:6px">Forma de pago</div>
+      <div class="methods">${['Efectivo','Transferencia','Débito'].map(m=>`<button data-act="method" data-m="${m}" aria-pressed="${m===method}">${m}</button>`).join('')}</div></div>
+    ${method==='Efectivo' ? `<div class="two"><label for="pagaCon">Paga con<input type="number" inputmode="decimal" id="pagaCon" placeholder="0"></label>
+      <div class="tile"><div class="lbl">Vuelto</div><div class="val num" id="vuelto">—</div></div></div>` : ''}
+    <button class="btn primary block" data-act="checkout" style="padding:16px;font-size:18px">Confirmar venta · ${money(total)}</button>
+  </div>`;
+}
+function refreshCartSheet(){
+  if (!cartCount()){ closeSheet(); renderGrid(); return; }
+  const prev = $('pagaCon') ? $('pagaCon').value : '';
+  openSheet(cartSheetHtml());
+  const pc = $('pagaCon');
+  if (pc){ pc.value = prev; const upd=()=>{ const v=num(pc.value); const d=v-cartTotal(); $('vuelto').textContent = pc.value==='' ? '—' : (d<0 ? 'Falta '+money(-d) : money(d)); $('vuelto').className='val num '+(d<0&&pc.value!==''?'neg':''); }; pc.oninput=upd; upd(); }
+}
+function checkout(){
+  const items = Object.entries(cart).map(([id,q]) => { const p=prodById(id); return {pid:id, name:p.name, qty:q, price:p.price, cost:p.cost}; });
+  const sale = {id:uid(), ts:Date.now(), items, method,
+    total: items.reduce((a,x)=>a+x.qty*x.price,0), costTotal: items.reduce((a,x)=>a+x.qty*x.cost,0)};
+  items.forEach(x => { const p=prodById(x.pid); if(p) p.stock -= x.qty; });
+  S.sales.push(sale); save();
+  cart = {}; method='Efectivo'; closeSheet(); render();
+  toast('Venta registrada: ' + money(sale.total));
+}
+
+/* ---------- Gastos de caja ---------- */
+function expenseSheet(){
+  openSheet(`<form class="stack" id="exForm">
+    <h2>Gasto de caja</h2>
+    <p class="muted small" style="margin:0">Plata que sacaste de la caja para pagar algo (un flete, limpieza, un arreglo…). Se descuenta de la caja en el balance.</p>
+    <label for="exAmt">Monto<input type="number" inputmode="decimal" step="any" id="exAmt" placeholder="0"></label>
+    <label for="exNote">¿En qué se gastó?<input type="text" id="exNote" placeholder="Ej: Flete, bolsas, cambio de lámpara"></label>
+    <div class="row" style="flex-wrap:wrap">${['Flete','Limpieza','Bolsas','Arreglo','Comida'].map(t=>`<button type="button" class="btn sm ghost" data-chip="${t}">${t}</button>`).join('')}</div>
+    <button class="btn primary block" type="submit">Guardar gasto</button>
+    <button class="btn ghost block" type="button" data-act="close">Cancelar</button>
+  </form>`);
+  document.querySelectorAll('[data-chip]').forEach(b => b.onclick = () => { $('exNote').value = b.dataset.chip; });
+  $('exForm').onsubmit = e => { e.preventDefault();
+    const amount = num($('exAmt').value);
+    if (amount <= 0){ toast('Poné el monto del gasto'); return; }
+    S.expenses.push({id:uid(), ts:Date.now(), amount, note:$('exNote').value.trim() || 'Gasto'});
+    save(); closeSheet(); render(); toast('Gasto anotado: ' + money(amount)); };
+  setTimeout(() => { const a=$('exAmt'); if(a) a.focus(); }, 60);
+}
+
+/* ---------- Productos ---------- */
+function viewProductos(){
+  const list = [...S.products].sort((a,b) => (a.stock<=a.min ? 0:1) - (b.stock<=b.min ? 0:1) || a.name.localeCompare(b.name));
+  const low = list.filter(p=>p.stock<=p.min).length;
+  return `<div class="stack">${demoBanner()}
+    <div class="row between"><h2>Productos</h2><button class="btn primary sm" data-act="newProd">+ Nuevo</button></div>
+    ${low ? `<div class="banner"><span><b>${low}</b> producto${low>1?'s':''} con poco stock. Anotalo${low>1?'s':''} para el mayorista.</span></div>`:''}
+    ${list.length ? `<div class="card list">${list.map(p => {
+      const margin = p.cost>0 ? Math.round((p.price-p.cost)/p.cost*100) : null;
+      return `<button class="item" data-act="editProd" data-id="${p.id}" style="background:none;border:0;border-bottom:1px solid var(--line);text-align:left;width:100%">
+        <div class="grow"><div style="font-weight:600">${esc(p.name)}</div>
+        <div class="small muted num">Venta ${money(p.price)} · Costo ${money(p.cost)}${margin!==null?` · Ganancia ${margin}%`:''}</div></div>
+        <span class="pill ${p.stock<=p.min?'low':'ok'} num">${p.stock} u.</span></button>`; }).join('')}</div>`
+      : `<div class="empty">No hay productos. Tocá “+ Nuevo” para cargar el primero.</div>`}
+  </div>`;
+}
+function prodSheet(p){
+  const isNew = !p; p = p || {name:'',price:'',cost:'',stock:'',min:3};
+  openSheet(`<form class="stack" id="prodForm">
+    <h2>${isNew?'Nuevo producto':'Editar producto'}</h2>
+    <label for="pfName">Nombre<input type="text" id="pfName" required value="${esc(p.name)}" placeholder="Ej: Coca-Cola 500 ml"></label>
+    <div class="two">
+      <label for="pfCost">Precio de costo<input type="number" inputmode="decimal" step="any" id="pfCost" value="${p.cost}" placeholder="0"></label>
+      <label for="pfPrice">Precio de venta<input type="number" inputmode="decimal" step="any" id="pfPrice" value="${p.price}" placeholder="0" required></label>
+    </div>
+    <div class="small muted" id="pfMargin"></div>
+    <div class="two">
+      <label for="pfStock">Stock actual<input type="number" inputmode="numeric" id="pfStock" value="${p.stock}" placeholder="0"></label>
+      <label for="pfMin">Avisarme con menos de<input type="number" inputmode="numeric" id="pfMin" value="${p.min}"></label>
+    </div>
+    <button class="btn primary block" type="submit">Guardar</button>
+    ${isNew ? '' : `<button class="btn danger block" type="button" id="pfDel">Eliminar producto</button>`}
+    <button class="btn ghost block" type="button" data-act="close">Cancelar</button>
+  </form>`);
+  const upd = () => { const c=num($('pfCost').value), v=num($('pfPrice').value);
+    $('pfMargin').textContent = c>0 && v>0 ? `Ganás ${money(v-c)} por unidad (${Math.round((v-c)/c*100)}% sobre el costo)` : ''; };
+  $('pfCost').oninput = upd; $('pfPrice').oninput = upd; upd();
+  $('prodForm').onsubmit = e => { e.preventDefault();
+    const data = {name:$('pfName').value.trim(), cost:num($('pfCost').value), price:num($('pfPrice').value), stock:Math.round(num($('pfStock').value)), min:Math.round(num($('pfMin').value))};
+    if (!data.name){ toast('Poné un nombre'); return; }
+    if (isNew) S.products.push({id:uid(), ...data}); else Object.assign(p, data);
+    save(); closeSheet(); render(); toast(isNew?'Producto agregado':'Cambios guardados'); };
+  if (!isNew) $('pfDel').onclick = () => confirmSheet('¿Eliminar producto?', `Se borra “${p.name}” de la lista. Las ventas pasadas no cambian.`, 'Eliminar', () => {
+    S.products = S.products.filter(x=>x.id!==p.id); delete cart[p.id]; save(); render(); toast('Producto eliminado'); });
+}
+
+/* ---------- Compras ---------- */
+function viewCompras(){
+  const recent = [...S.purchases].sort((a,b)=>b.ts-a.ts).slice(0,15);
+  return `<div class="stack">${demoBanner()}
+    <div class="row between"><h2>Compras</h2><div class="row"><button class="btn ghost sm" data-act="newExpense">− Gasto de caja</button><button class="btn primary sm" data-act="newPurchase">+ Nueva compra</button></div></div>
+    <p class="muted small" style="margin:0">Cargá lo que compraste en el mayorista: se suma al stock y se descuenta en el balance.</p>
+    ${recent.length ? `<div class="card list">${recent.map(c => `
+      <div class="item"><div class="grow"><div style="font-weight:600">${esc(c.supplier||'Sin proveedor')}</div>
+      <div class="small muted">${new Date(c.ts).toLocaleDateString('es-AR',{day:'numeric',month:'short'})} ${hhmm(c.ts)} · ${c.items.map(i=>esc(i.qty+' '+i.name)).join(', ')}</div></div>
+      <div class="num" style="font-weight:700">${money(c.total)}</div>
+      <button class="btn sm ghost" data-act="delPurchase" data-id="${c.id}" aria-label="Anular compra">Anular</button></div>`).join('')}</div>`
+      : `<div class="empty">Todavía no registraste compras.</div>`}
+    <div class="row between" style="margin-top:8px"><h2 style="font-size:20px">Gastos de caja</h2><button class="btn ghost sm" data-act="newExpense">+ Anotar gasto</button></div>
+    <p class="muted small" style="margin:0">Plata que sacaste de la caja para pagar algo que no es mercadería (flete, limpieza, un arreglo…).</p>
+    ${S.expenses.length ? `<div class="card list">${[...S.expenses].sort((a,b)=>b.ts-a.ts).slice(0,15).map(x => `
+      <div class="item"><div class="grow"><div style="font-weight:600">${esc(x.note)}</div>
+      <div class="small muted">${new Date(x.ts).toLocaleDateString('es-AR',{day:'numeric',month:'short'})} ${hhmm(x.ts)}</div></div>
+      <div class="num neg" style="font-weight:700">−${money(x.amount)}</div>
+      <button class="btn sm ghost" data-act="delExpense" data-id="${x.id}" aria-label="Anular gasto">Anular</button></div>`).join('')}</div>`
+      : `<div class="empty" style="padding:16px">Todavía no anotaste gastos.</div>`}
+  </div>`;
+}
+function purchaseSheet(){
+  if (!S.products.length){ toast('Primero cargá productos'); setTab('productos'); return; }
+  const total = pLines.reduce((a,l)=>a+l.qty*l.cost,0);
+  const sup = $('puSup') ? $('puSup').value : (purchaseSheet._sup||'');
+  openSheet(`<div class="stack">
+    <h2>Nueva compra</h2>
+    <label for="puSup">Mayorista o proveedor<input type="text" id="puSup" value="${esc(sup)}" placeholder="Ej: Mayorista Don Pepe"></label>
+    <label for="puAdd">Agregar producto<select id="puAdd"><option value="">Elegí un producto…</option>${[...S.products].sort((a,b)=>a.name.localeCompare(b.name)).map(p=>`<option value="${p.id}">${esc(p.name)} (stock ${p.stock})</option>`).join('')}</select></label>
+    ${pLines.length ? `<div class="card list">${pLines.map((l,i) => { const p=prodById(l.pid); return `
+      <div class="item" style="flex-wrap:wrap"><div class="grow" style="flex-basis:100%;font-weight:600">${esc(p?p.name:'?')}</div>
+        <label for="puQ${i}" style="flex:1">Cantidad<input type="number" inputmode="numeric" id="puQ${i}" data-line="${i}" data-f="qty" value="${l.qty}"></label>
+        <label for="puC${i}" style="flex:1">Costo c/u<input type="number" inputmode="decimal" step="any" id="puC${i}" data-line="${i}" data-f="cost" value="${l.cost}"></label>
+        <button class="btn sm ghost" data-act="rmLine" data-i="${i}" style="align-self:flex-end" aria-label="Quitar">Quitar</button></div>`; }).join('')}</div>` : `<p class="muted small" style="margin:0">Elegí los productos que compraste.</p>`}
+    <label class="row" style="flex-direction:row;font-weight:500;color:var(--ink)"><input type="checkbox" id="puUpd" checked style="width:20px;height:20px"> Actualizar el precio de costo de cada producto</label>
+    <div class="row between"><span class="muted" style="font-weight:600">Total de la compra</span><span class="num" id="puTotal" style="font-family:var(--font-display);font-size:30px">${money(total)}</span></div>
+    <button class="btn primary block" data-act="savePurchase" ${pLines.length?'':'disabled style="opacity:.5"'}>Guardar compra</button>
+    <button class="btn ghost block" data-act="close">Cancelar</button>
+  </div>`);
+  $('puAdd').onchange = e => { const id=e.target.value; if(!id) return; const p=prodById(id);
+    const ex = pLines.find(l=>l.pid===id); if (ex) ex.qty++; else pLines.push({pid:id, qty:1, cost:p.cost});
+    purchaseSheet._sup=$('puSup').value; purchaseSheet(); };
+  document.querySelectorAll('[data-line]').forEach(inp => inp.oninput = () => {
+    const l = pLines[+inp.dataset.line]; l[inp.dataset.f] = inp.dataset.f==='qty' ? Math.round(num(inp.value)) : num(inp.value);
+    $('puTotal').textContent = money(pLines.reduce((a,l)=>a+l.qty*l.cost,0)); });
+}
+function savePurchase(){
+  const lines = pLines.filter(l=>l.qty>0);
+  if (!lines.length){ toast('Agregá al menos un producto'); return; }
+  const upd = $('puUpd').checked;
+  const items = lines.map(l => { const p=prodById(l.pid); p.stock += l.qty; if (upd && l.cost>0) p.cost = l.cost; return {pid:l.pid, name:p.name, qty:l.qty, cost:l.cost}; });
+  S.purchases.push({id:uid(), ts:Date.now(), supplier:$('puSup').value.trim(), items, total:items.reduce((a,x)=>a+x.qty*x.cost,0)});
+  save(); pLines=[]; purchaseSheet._sup=''; closeSheet(); render(); toast('Compra guardada y stock actualizado');
+}
+
+/* ---------- Balance ---------- */
+function inPeriod(ts){ const d=new Date(ts); return period==='day' ? sameDay(d,ref) : sameMonth(d,ref); }
+function viewBalance(){
+  const sales = S.sales.filter(s=>inPeriod(s.ts));
+  const purch = S.purchases.filter(c=>inPeriod(c.ts));
+  const ventas = sales.reduce((a,s)=>a+s.total,0);
+  const costo = sales.reduce((a,s)=>a+s.costTotal,0);
+  const ganancia = ventas - costo;
+  const compras = purch.reduce((a,c)=>a+c.total,0);
+  const exps = S.expenses.filter(x=>inPeriod(x.ts)).sort((a,b)=>b.ts-a.ts);
+  const gastos = exps.reduce((a,x)=>a+x.amount,0);
+  const caja = ventas - compras - gastos;
+  const expList = `<div class="card"><div class="row between" style="margin-bottom:4px"><b>Gastos de caja (${exps.length})</b><button class="btn sm ghost" data-act="newExpense">+ Anotar</button></div>${exps.length ? `<div class="list">${exps.map(x => `
+    <div class="item"><span class="small muted num" style="width:48px">${period==='day' ? hhmm(x.ts) : new Date(x.ts).getDate()+'/'+(new Date(x.ts).getMonth()+1)}</span><div class="grow small">${esc(x.note)}</div>
+    <b class="num neg">−${money(x.amount)}</b><button class="btn sm ghost" data-act="delExpense" data-id="${x.id}" aria-label="Anular gasto">Anular</button></div>`).join('')}</div>` : `<div class="small muted">Sin gastos en este período.</div>`}</div>`;
+  const byMethod = {}; sales.forEach(s => byMethod[s.method]=(byMethod[s.method]||0)+s.total);
+  const byProd = {}; sales.forEach(s => s.items.forEach(i => { byProd[i.name]=byProd[i.name]||{q:0,t:0}; byProd[i.name].q+=i.qty; byProd[i.name].t+=i.qty*i.price; }));
+  const top = Object.entries(byProd).sort((a,b)=>b[1].q-a[1].q).slice(0,5);
+  const topMax = top.length ? top[0][1].q : 1;
+  const now = new Date();
+  const isCurrent = period==='day' ? sameDay(ref,now) : sameMonth(ref,now);
+  const label = period==='day'
+    ? (isCurrent ? 'Hoy' : ref.toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long'}))
+    : ref.toLocaleDateString('es-AR',{month:'long',year:'numeric'});
+
+  let days = '';
+  if (period==='month'){
+    const map = {}; sales.forEach(s => { const d=new Date(s.ts).getDate(); map[d]=(map[d]||0)+s.total; });
+    const entries = Object.entries(map).sort((a,b)=>b[0]-a[0]); const mx = Math.max(1,...Object.values(map));
+    days = entries.length ? `<div class="card"><div style="font-weight:700;margin-bottom:8px">Ventas por día</div><div class="stack" style="gap:8px">${entries.map(([d,t]) => `
+      <button data-act="goDay" data-d="${d}" style="background:none;border:0;padding:0;text-align:left;display:grid;grid-template-columns:44px 1fr 96px;gap:8px;align-items:center">
+        <span class="small muted num">${d}/${ref.getMonth()+1}</span><span class="bar"><span style="width:${t/mx*100}%"></span></span><span class="num small" style="text-align:right;font-weight:600">${money(t)}</span></button>`).join('')}</div></div>` : '';
+  }
+  const salesList = period==='day' && sales.length ? `<div class="card"><div style="font-weight:700;margin-bottom:4px">Ventas del día (${sales.length})</div><div class="list">${[...sales].sort((a,b)=>b.ts-a.ts).map(s => `
+    <div class="item"><span class="small muted num" style="width:44px">${hhmm(s.ts)}</span><div class="grow small">${s.items.map(i=>esc(i.qty+'× '+i.name)).join(', ')}<div class="muted">${esc(s.method)}</div></div>
+    <b class="num">${money(s.total)}</b><button class="btn sm ghost" data-act="delSale" data-id="${s.id}" aria-label="Anular venta">Anular</button></div>`).join('')}</div></div>` : '';
+
+  return `<div class="stack">${demoBanner()}
+    <div class="seg"><button data-act="period" data-p="day" aria-pressed="${period==='day'}">Día</button><button data-act="period" data-p="month" aria-pressed="${period==='month'}">Mes</button></div>
+    <div class="row between"><button class="btn sm ghost" data-act="prev" aria-label="Anterior">‹</button><h2 style="text-transform:capitalize;font-size:22px">${esc(label)}</h2><button class="btn sm ghost" data-act="next" aria-label="Siguiente" ${isCurrent?'disabled style="opacity:.3"':''}>›</button></div>
+    <div class="tiles">
+      <div class="tile big"><div class="lbl">Ganancia (ventas menos costo de lo vendido)</div><div class="val num ${ganancia>=0?'pos':'neg'}">${money(ganancia)}</div><div class="small" style="opacity:.75;margin-top:4px">${sales.length} venta${sales.length===1?'':'s'}${ventas>0?` · margen ${Math.round(ganancia/ventas*100)}%`:''}${gastos>0?` · después de gastos ${money(ganancia-gastos)}`:''}</div></div>
+      <div class="tile"><div class="lbl">Vendido</div><div class="val num">${money(ventas)}</div></div>
+      <div class="tile"><div class="lbl">Costo de lo vendido</div><div class="val num">${money(costo)}</div></div>
+      <div class="tile"><div class="lbl">Compras al mayorista</div><div class="val num">${money(compras)}</div></div>
+      <div class="tile"><div class="lbl">Gastos de caja</div><div class="val num">${money(gastos)}</div></div>
+      <div class="tile" style="grid-column:1/-1"><div class="lbl">Caja (vendido − compras − gastos)</div><div class="val num ${caja>=0?'pos':'neg'}">${money(caja)}</div></div>
+    </div>
+    ${sales.length ? `<div class="card"><div style="font-weight:700;margin-bottom:8px">Por forma de pago</div><div class="stack" style="gap:6px">${['Efectivo','Transferencia','Débito'].map(m => `<div class="row between small"><span>${m}</span><b class="num">${money(byMethod[m]||0)}</b></div>`).join('')}</div></div>
+    <div class="card"><div style="font-weight:700;margin-bottom:8px">Lo más vendido</div><div class="stack" style="gap:8px">${top.map(([n,v]) => `
+      <div><div class="row between small"><span>${esc(n)}</span><span class="num muted">${v.q} u. · ${money(v.t)}</span></div><div class="bar" style="margin-top:4px"><span style="width:${v.q/topMax*100}%"></span></div></div>`).join('')}</div></div>` : `<div class="empty">No hay ventas en este período.</div>`}
+    ${days}${salesList}${expList}
+  </div>`;
+}
+
+/* ---------- Ajustes / copia de seguridad ---------- */
+function settingsSheet(){
+  openSheet(`<div class="stack">
+    <h2>Copia de seguridad</h2>
+    <p class="muted small" style="margin:0">Los datos se guardan solo en este celular. Copiá la copia de seguridad y guardala en un chat o en tus notas, por si cambiás de teléfono o se borra la app.</p>
+    <button class="btn dark block" id="bkCopy">Copiar copia de seguridad</button>
+    <label for="bkText">Restaurar: pegá acá una copia guardada<textarea id="bkText" placeholder="Pegá el texto de la copia…"></textarea></label>
+    <button class="btn ghost block" id="bkRestore">Restaurar datos</button>
+    <hr style="border:0;border-top:1px solid var(--line);width:100%">
+    <button class="btn danger block" id="bkWipe">Borrar todos los datos</button>
+    <button class="btn ghost block" data-act="close">Cerrar</button>
+  </div>`);
+  $('bkCopy').onclick = async () => { const txt = JSON.stringify(S);
+    try{ await navigator.clipboard.writeText(txt); toast('Copia copiada. Pegala en un lugar seguro.'); }
+    catch(e){ $('bkText').value = txt; $('bkText').select(); toast('Seleccioná el texto y copialo a mano'); } };
+  $('bkRestore').onclick = () => { try{ const d = JSON.parse($('bkText').value);
+      if (!Array.isArray(d.products)||!Array.isArray(d.sales)||!Array.isArray(d.purchases)) throw 0;
+      if (!Array.isArray(d.expenses)) d.expenses = [];
+      confirmSheet('¿Restaurar esta copia?', 'Los datos actuales se reemplazan por los de la copia.', 'Restaurar', () => { S = d; save(); cart={}; render(); toast('Datos restaurados'); });
+    }catch(e){ toast('Ese texto no es una copia válida'); } };
+  $('bkWipe').onclick = () => confirmSheet('¿Borrar todo?', 'Se eliminan productos, ventas, compras y gastos de este celular. No se puede deshacer.', 'Borrar todo', () => {
+    S = {products:[], sales:[], purchases:[], expenses:[], demo:false}; cart={}; save(); render(); toast('Datos borrados'); });
+}
+$('btnSettings').onclick = settingsSheet;
+
+/* ---------- Acciones (un solo manejador) ---------- */
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-act]'); if (!el || el.disabled) return;
+  const a = el.dataset.act, id = el.dataset.id;
+  switch(a){
+    case 'close': closeSheet(); if (tab==='vender') renderGrid(); break;
+    case 'add': cart[id]=(cart[id]||0)+1; renderGrid(); break;
+    case 'clearCart': cart={}; renderGrid(); break;
+    case 'openCart': refreshCartSheet(); break;
+    case 'inc': cart[id]++; refreshCartSheet(); break;
+    case 'dec': cart[id]--; if (cart[id]<=0) delete cart[id]; refreshCartSheet(); break;
+    case 'method': method=el.dataset.m; refreshCartSheet(); break;
+    case 'checkout': checkout(); break;
+    case 'clearQ': { query=''; const q=$('q'); if(q){ q.value=''; q.focus(); } el.hidden=true; renderGrid(); } break;
+    case 'newExpense': expenseSheet(); break;
+    case 'delExpense': confirmSheet('¿Anular gasto?', 'Se borra este gasto y la plata vuelve a contar en la caja.', 'Anular gasto', () => {
+        S.expenses = S.expenses.filter(x=>x.id!==id); save(); render(); toast('Gasto anulado'); }); break;
+    case 'goProductos': setTab('productos'); break;
+    case 'newProd': prodSheet(null); break;
+    case 'editProd': prodSheet(prodById(id)); break;
+    case 'newPurchase': pLines=[]; purchaseSheet._sup=''; purchaseSheet(); break;
+    case 'rmLine': pLines.splice(+el.dataset.i,1); purchaseSheet._sup=$('puSup').value; purchaseSheet(); break;
+    case 'savePurchase': savePurchase(); break;
+    case 'delPurchase': confirmSheet('¿Anular compra?', 'Se quita la compra y se resta del stock lo que habías sumado.', 'Anular compra', () => {
+        const c = S.purchases.find(x=>x.id===id); if(!c) return; c.items.forEach(i => { const p=prodById(i.pid); if(p) p.stock -= i.qty; });
+        S.purchases = S.purchases.filter(x=>x.id!==id); save(); render(); toast('Compra anulada'); }); break;
+    case 'delSale': confirmSheet('¿Anular venta?', 'Se borra la venta y los productos vuelven al stock.', 'Anular venta', () => {
+        const s = S.sales.find(x=>x.id===id); if(!s) return; s.items.forEach(i => { const p=prodById(i.pid); if(p) p.stock += i.qty; });
+        S.sales = S.sales.filter(x=>x.id!==id); save(); render(); toast('Venta anulada'); }); break;
+    case 'period': period=el.dataset.p; ref=new Date(); render(); break;
+    case 'prev': if (period==='day') ref.setDate(ref.getDate()-1); else { ref.setDate(1); ref.setMonth(ref.getMonth()-1); } ref=new Date(ref); render(); break;
+    case 'next': if (period==='day') ref.setDate(ref.getDate()+1); else { ref.setDate(1); ref.setMonth(ref.getMonth()+1); } ref=new Date(ref); render(); break;
+    case 'goDay': period='day'; ref=new Date(ref.getFullYear(), ref.getMonth(), +el.dataset.d); render(); $('main').scrollTop=0; break;
+    case 'clearDemo': confirmSheet('¿Empezar de cero?', 'Se borran los productos y ventas de ejemplo para que cargues los tuyos.', 'Borrar ejemplos', () => {
+        S = {products:[], sales:[], purchases:[], expenses:[], demo:false}; cart={}; save(); setTab('productos'); toast('Listo, cargá tus productos'); }); break;
+  }
+});
+
+/* ---------- Inicio ---------- */
+S = load() || seed();
+if (!Array.isArray(S.expenses)) S.expenses = [];
+save();
+setTab('vender');
+
+/* ---------- Funcionar sin internet ---------- */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(() => {}); });
+}
+/* Pedir al navegador que no borre los datos guardados */
+if (navigator.storage && navigator.storage.persist) { navigator.storage.persist().catch(() => {}); }
+</script>
+</body>
+</html>
